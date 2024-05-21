@@ -1,99 +1,52 @@
-import { Route, Routes, useNavigate } from "react-router-dom";
+import { createBrowserRouter, Router, RouterProvider } from "react-router-dom";
+
+// layout
+import MainLayout from "./layout/MainLayout";
+
+// pages
 import Home from "./pages/Home";
 import About from "./pages/About";
-import Products from "./pages/Products";
+import Contact from "./pages/Contact";
 import Cart from "./pages/Cart";
-import Details from "./pages/Details";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import Checkout from "./pages/Checkout";
-import Orders from "./pages/Orders";
-import Layout from "./layout";
-import "./App.css";
+import Product from "./pages/Product";
+
+// loaders
+import { loader as HomeLoader } from "./pages/Home";
+import { loader as ProductLoader } from "./pages/Product";
 
 function App() {
-  const navigate = useNavigate();
+  const routes = createBrowserRouter([
+    {
+      path: "/",
+      element: <MainLayout />,
+      children: [
+        {
+          index: true,
+          element: <Home />,
+          loader: HomeLoader,
+        },
+        {
+          path: "/about",
+          element: <About />,
+        },
+        {
+          path: "/contact",
+          element: <Contact />,
+        },
+        {
+          path: "/cart",
+          element: <Cart />,
+        },
+        {
+          path: "/product/:id",
+          element: <Product />,
+          loader: ProductLoader,
+        },
+      ],
+    },
+  ]);
 
-  function ProtectedRoute({
-    children,
-    isAuthentication,
-    redirectTo = "/login",
-  }) {
-    if (!isAuthentication) {
-      navigate(redirectTo);
-    }
-
-    return children;
-  }
-
-  return (
-    <Routes>
-      {/* public */}
-      <Route
-        path="/"
-        element={
-          <Layout>
-            <Home></Home>
-          </Layout>
-        }
-      ></Route>
-      <Route
-        path="/about"
-        element={
-          <Layout>
-            <About></About>
-          </Layout>
-        }
-      ></Route>
-      <Route
-        path="/products"
-        element={
-          <Layout>
-            <Products></Products>
-          </Layout>
-        }
-      ></Route>
-      <Route
-        path="/cart"
-        element={
-          <Layout>
-            <Cart></Cart>
-          </Layout>
-        }
-      ></Route>
-      <Route
-        path="/product/:id"
-        element={
-          <Layout>          
-            <Details></Details>
-          </Layout>
-        }></Route>
-      <Route path="/login" element={<Login></Login>}></Route>
-      <Route path="/register" element={<Register></Register>}></Route>
-
-      {/* prootected */}
-      <Route
-        path="/checkout"
-        element={
-          <ProtectedRoute isAuthentication={false}>
-            <Layout>
-              <Checkout></Checkout>
-            </Layout>
-          </ProtectedRoute>
-        }
-      ></Route>
-      <Route
-        path="/orders"
-        element={
-          <ProtectedRoute isAuthentication={false}>
-            <Layout>
-              <Orders></Orders>
-            </Layout>
-          </ProtectedRoute>
-        }
-      ></Route>
-    </Routes>
-  );
+  return <RouterProvider router={routes} />;
 }
 
 export default App;
